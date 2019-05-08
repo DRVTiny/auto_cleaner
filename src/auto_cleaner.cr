@@ -11,12 +11,12 @@ module Auto
       @fl_on_exit_handled = false
       @fs_objects = {files: [] of String, dirs: [] of String}
     end
-
+		
     def add_proc(args : T, &block : T -> Int32) forall T
       @clean_procs.push(
         ->{
           block.call(args)
-        });
+        })
       unless @fl_on_exit_handled
 	      at_exit { make_mrproper }
 	      @fl_on_exit_handled = true
@@ -38,9 +38,12 @@ module Auto
     {% end %}
 
     def make_mrproper
+    	return unless @clean_procs.size > 0 || @fs_objects[:files].size > 0 || @fs_objects[:dirs].size > 0
       @clean_procs.each { |p| p.call }
       FileUtils.rm(   @fs_objects[:files].select { |f| File.exists?(f) } )
       FileUtils.rm_r( @fs_objects[:dirs].select  { |d| File.exists?(d) } )
+      @clean_procs = [] of Proc(Nil)
+      @fs_objects = {files: [] of String, dirs: [] of String}
     end    
   end
 end

@@ -18,9 +18,17 @@ TODO: Write a description here
 
 ```crystal
 require "auto_cleaner"
-```
+ac = Auto::Cleaner.new
+ac.add_file( File.tempfile("prefix", ".tmp").path )
+ac.add_proc(nil) { puts "Cleaning in progress"; 1 }
 
-TODO: Write usage instructions here
+# you can call this method directly, but it will be called
+# automagically on application exit
+# if you call this method explicitly, then all lists of objects to be
+# cleaned on exit will be emptied
+
+ac.make_mrproper
+```
 
 ## Development
 
