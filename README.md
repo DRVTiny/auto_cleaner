@@ -20,7 +20,13 @@ Auto::Cleaner class takes responsibility for removing temporary files, directori
 require "auto_cleaner"
 ac = Auto::Cleaner.new
 ac.add_file( File.tempfile("prefix", ".tmp").path )
-ac.add_proc(nil) { puts "Cleaning in progress"; 1 }
+send_message_to = {host: "myserver.example.com", account: "somebody@example.com"}
+ac.add_proc(send_message_to) do |useful_info|
+	puts "Cleaning in progress"
+	puts "After all we need to send message about cleaning status to..."
+	pp useful_info
+	1
+end
 
 # you can call this method directly, but it will be called
 # automagically on application exit
