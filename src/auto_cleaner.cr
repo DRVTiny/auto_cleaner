@@ -1,12 +1,14 @@
 # TODO: Write documentation for `AutoCleaner`
-
 require "file_utils"
 module Auto
   class Cleaner
     VERSION = "0.7.1"
     
+    @fl_on_exit_handled : Bool
+    
     def initialize
       @clean_procs = [] of Proc(Nil)
+      @fl_on_exit_handled = false
       @fs_objects = {files: [] of String, dirs: [] of String}
     end
 
@@ -14,7 +16,11 @@ module Auto
       @clean_procs.push(
         ->{
           block.call(args)
-        })
+        });
+      unless @fl_on_exit_handled
+	      at_exit { make_mrproper }
+	      @fl_on_exit_handled = true
+	    end
     end
 
     {% for subst in ["file", "dir"] %}
@@ -24,17 +30,17 @@ module Auto
         else
           @fs_objects[:{{subst.id}}s].push(path)
         end
+        unless @fl_on_exit_handled
+          at_exit { make_mrproper }
+          @fl_on_exit_handled = true
+        end
       end
     {% end %}
 
     def make_mrproper
       @clean_procs.each { |p| p.call }
-      FileUtils.rm(@fs_objects[:files].select { |f| File.exists?(f) })
-      FileUtils.rm_r(@fs_objects[:dirs].select { |d| File.exists?(d) })
-    end
-    
-    def finalize
-      make_mrproper
-    end
+      FileUtils.rm(   @fs_objects[:files].select { |f| File.exists?(f) } )
+      FileUtils.rm_r( @fs_objects[:dirs].select  { |d| File.exists?(d) } )
+    end    
   end
 end
