@@ -2,7 +2,7 @@
 require "file_utils"
 module Auto
   class Cleaner
-    VERSION = "0.7.1"
+    VERSION = "0.7.3"
     
     @fl_on_exit_handled : Bool
     
@@ -38,7 +38,7 @@ module Auto
     {% end %}
 
     def make_mrproper
-    	return unless @clean_procs.size > 0 || @fs_objects[:files].size > 0 || @fs_objects[:dirs].size > 0
+    	return if @clean_procs.empty? && @fs_objects[:files].empty? && @fs_objects[:dirs].empty?
       @clean_procs.each { |p| p.call }
       FileUtils.rm(   @fs_objects[:files].select { |f| File.exists?(f) } )
       FileUtils.rm_r( @fs_objects[:dirs].select  { |d| File.exists?(d) } )
