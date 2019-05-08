@@ -1,6 +1,6 @@
 # auto_cleaner
 
-TODO: Write a description here
+Auto::Cleaner class takes responsibility for removing temporary files, directories and running custom cleaning procedures on exit
 
 ## Installation
 
